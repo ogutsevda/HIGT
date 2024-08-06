@@ -1,6 +1,11 @@
 import os, h5py, glob
 import numpy as np
-from wsi_core.wsi_utils import save_hdf5
+
+import sys
+
+sys.path.append(os.getcwd())
+
+from CLAM.wsi_core.wsi_utils import save_hdf5
 
 
 def generate_coords_file(source_mag_seg_path, target_mag):
@@ -14,8 +19,9 @@ def generate_coords_file(source_mag_seg_path, target_mag):
     cur_patch_size = int(source_mag_seg_path.split("/")[-1].split("_")[-1])
     target_patch_size = int(cur_patch_size / int(target_mag / cur_mag))
 
-    for h5 in glob.glob(source_mag_seg_path + "/patches/*"):
-        h5_content = h5py.File(h5, "r")
+    patch_dir = os.path.join(source_mag_seg_path, "patches")
+    for h5 in os.listdir(patch_dir):
+        h5_content = h5py.File(os.path.join(patch_dir, h5), "r")
 
         coords = h5_content["coords"][:]
         save_path = (
@@ -56,3 +62,15 @@ def generate_coords_file(source_mag_seg_path, target_mag):
             {"coords": attr},
             mode="w",
         )
+
+        # break
+
+
+generate_coords_file(
+    source_mag_seg_path=os.path.join(
+        os.getcwd(), "../BRCA_images_todel/segmented_patch/mag5x_patch512_4096"
+    ),
+    target_mag=10,
+)
+
+print("Done")
